@@ -12,7 +12,7 @@ class Field {
 	constructor(field) {
         this._field = field;
         this._playerPosition = [0,0];
-        this._IsPlaying = true;
+        this._isPlaying = true;
 	}
     
 	static generateField() {
@@ -138,7 +138,7 @@ class Field {
         console.log(this._playerPosition)
         this.randomStart(height,width);
         //if the user cant find a love yet or the game is not over yet continue the game
-        while(this._IsPlaying) {
+        while(this._isPlaying) {
 
             //print game map everytime when user input the direction
             this.print();
