@@ -16,9 +16,9 @@ class Field {
         this._isPlaying = true;
 	}
     
-    
 	static generateField() {
         const field = [];
+        
         //take input from the user
         const height = +prompt('Enter height of the field: ');
         const width = +prompt('Enter width of the field: ');
@@ -103,53 +103,120 @@ class Field {
     }
 
     move(userDirection) {
-
-        //create variable to hold position
-        // let height = this._playerPositionY;
-        // let width = this._playerPositionX;
-
-        //move the location of the player
         switch(userDirection) {
-            case 'u':            
-                this._field[this._playerPositionY][this._playerPositionX] = lovePath; //when move leave the rose path behind
-                this._field[this._playerPositionY -= 1][this._playerPositionX] = myBrokenHeart; //move up
+            case 'u':
+                if (this._playerPositionY - 1 < 0) {
+                    console.log("You fell out of bounds! Game over loser!");
+                    this._isPlaying = false;
+                    return;
+                }
+                this._field[this._playerPositionY][this._playerPositionX] = lovePath;
+                this.checkConditionUp();
+                this._playerPositionY -= 1;
                 break;
-                
+    
             case 'd':
-                this._field[this._playerPositionY][this._playerPositionX] = lovePath; //when move leave the rose path behind
-                this._field[this._playerPositionY += 1][this._playerPositionX] = myBrokenHeart; //move down  
+                if (this._playerPositionY + 1 >= this._field.length) {
+                    console.log("You fell out of bounds! Game over loser!");
+                    this._isPlaying = false;
+                    return;
+                }
+                this._field[this._playerPositionY][this._playerPositionX] = lovePath;
+                this.checkConditionDown();
+                this._playerPositionY += 1;
                 break;
-                    
+    
             case 'l':
-                this._field[this._playerPositionY][this._playerPositionX] = lovePath; //when move leave the rose path behind
-                this._field[this._playerPositionY][this._playerPositionX -= 1] = myBrokenHeart; //move left
+                if (this._playerPositionX - 1 < 0) {
+                    console.log("You fell out of bounds! Game over loser!");
+                    this._isPlaying = false;
+                    return;
+                }
+                this._field[this._playerPositionY][this._playerPositionX] = lovePath;
+                this.checkConditionLeft();
+                this._playerPositionX -= 1;
                 break;
-                        
+    
             case 'r':
-                this._field[this._playerPositionY][this._playerPositionX] = lovePath; //when move leave the rose path behind
-                this._field[this._playerPositionY][this._playerPositionX += 1] = myBrokenHeart; //move right
+                if (this._playerPositionX + 1 >= this._field[0].length) {
+                    console.log("You fell out of bounds! Game over loser!");
+                    this._isPlaying = false;
+                    return;
+                }
+                this._field[this._playerPositionY][this._playerPositionX] = lovePath;
+                this.checkConditionRight();
+                this._playerPositionX += 1;
                 break;
-                            
+    
             default:
-                console.log('Invalid direction!, Please try again!');
+                console.log("Invalid move!");
                 break;
-            }
+        }
+    
+        this._field[this._playerPositionY][this._playerPositionX] = myBrokenHeart;
     }
     
-    checkCondition() {
-        const checkCondition = this._field[this._playerPositionY] && this._field[this._playerPositionY][this._playerPositionX];
     
-        if (!checkCondition) {
-            console.log("You fell out of bounds! Game over loser!");
-            this._isPlaying = false;
-        } else if (checkCondition === hole) {
-            console.log("You fell in a hole! Game over loser!");
-            this._isPlaying = false;
-        } else if (checkCondition === myLove) {
-            console.log("Congratulations, you found your love 💖!!!");
-            this._isPlaying = false;
+
+    checkConditionUp() {
+        switch (this._field[this._playerPositionY - 1][this._playerPositionX]) {
+            case hole:
+                console.log("You fell in a hole! Game over loser!");
+                this._isPlaying = false;
+                break;
+            
+            case myLove:
+                console.log("Congratulations, you found your love 💖!!!");
+                this._isPlaying = false;
+                break;
+
         }
 
+    }
+
+    checkConditionDown() {
+        switch (this._field[this._playerPositionY + 1][this._playerPositionX]) {
+            case hole:
+                console.log("You fell in a hole! Game over loser!");
+                this._isPlaying = false;
+                break;
+            
+            case myLove:
+                console.log("Congratulations, you found your love 💖!!!");
+                this._isPlaying = false;
+                break;
+
+        }
+    }
+
+    checkConditionLeft() {
+        switch (this._field[this._playerPositionY][this._playerPositionX - 1]) {
+            case hole:
+                console.log("You fell in a hole! Game over loser!");
+                this._isPlaying = false;
+                break;
+            
+            case myLove:
+                console.log("Congratulations, you found your love 💖!!!");
+                this._isPlaying = false;
+                break;
+
+        }
+    }
+
+    checkConditionRight() {
+        switch (this._field[this._playerPositionY][this._playerPositionX + 1]) {
+            case hole:
+                console.log("You fell in a hole! Game over loser!");
+                this._isPlaying = false;
+                break;
+            
+            case myLove:
+                console.log("Congratulations, you found your love 💖!!!");
+                this._isPlaying = false;
+                break;
+
+        }
     }
     
     play() {
@@ -160,21 +227,18 @@ class Field {
 
         //random staring position
         this.randomStart(height,width);
-
+        
         //if the user cant find a love yet or the game is not over yet continue the game
-        while(this._isPlaying === true) {
+        while(this._isPlaying) {
 
             //print game map everytime when user input the direction
             this.print();
-
+            
             //take direction from the user
             const userDirection = prompt('Which way (u as Up, d as Down, l as Left, r as Right)!? ').toLowerCase();
-
+            
             //when user input the direction then call the move method to move the broken heart
             this.move(userDirection);
-
-            //check game consition
-            this.checkCondition();
         }
     }
 }
