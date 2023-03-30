@@ -1,7 +1,6 @@
 //make user be able to input the data
 const prompt = require('prompt-sync')({ sigint: true });
 
-//create game variable
 const myLove = '💕'; // finish
 const hole = '⚫';
 const glassField = '🟩';
@@ -9,241 +8,204 @@ const myBrokenHeart = '💔'; //start
 const lovePath = '🌹'; //moving the broken heart and leave rose path behind
 
 class Field {
-	constructor(field) {
+    constructor(field) {
         this._field = field;
         this._playerPositionX = 0;
         this._playerPositionY = 0;
         this._isPlaying = true;
-	}
-    
-	static generateField() {
+    }
+
+    static generateField() {
         const field = [];
-        
-        //take input from the user
+
+        //take input from user
         const height = +prompt('Enter height of the field: ');
         const width = +prompt('Enter width of the field: ');
-        const percentage = +prompt('Enter percentage of the holes you prefer: ');
-        
+        const percentage = +prompt('Enter percentage of the hole you prefer (0-100): ');
+
         //create number of holes in the field
         const numHoles = Math.floor((height * width) * (percentage / 100));
-        
-        //create only a field path (empty)
+
+        //create a field with only field character (empty)
         for (let i = 0; i < height; i++) {
             let arrRow = [];
-			for (let j = 0; j < width; j++) {
-                arrRow.push(glassField); //make row array ['🟩','🟩','🟩']
-			}
-			field.push(arrRow); /* make column with row arrays (2D) [
-                                                                            ['🟩','🟩','🟩'],
-                                                                            ['🟩','🟩','🟩'],
-                                                                            ['🟩','🟩','🟩']
-                                                                        ] */
-                                                                        //for loop help return line by line
-		}
+            for (let j = 0; j < width; j++) {
+                arrRow.push(glassField); //return array in 1 row 
+            }
+            field.push(arrRow); // return array in 2D
+        }
 
+        //create holes
         //iterate until all holes is created
         for (let i = 0; i < numHoles; i++) {
-            //random the location of each holes
+
+            //random the location of each hole
             let holeX = Math.floor(Math.random() * width);
             let holeY = Math.floor(Math.random() * height);
 
-            //if the random location is empty then replace with hole
-            //if the random location is not an empty then iterate until empty is found
+            //if the random hole location is not an empty then iterate until empty is found
             while (field[holeY][holeX] !== glassField) {
                 holeX = Math.floor(Math.random() * width);
                 holeY = Math.floor(Math.random() * height);
             }
-            field[holeY][holeX] = hole;
+            field[holeY][holeX] = hole; //that location is hole
         }
 
-        //random the location of my love
+        //create myLove
+        //random the location of the myLove
         let myLoveX = Math.floor(Math.random() * width);
         let myLoveY = Math.floor(Math.random() * height);
 
-        //if the random location is empty then replace with myLove
-        //if the random location is not an empty then iterate until empty is found
+        //if the random myLove location is not an empty then iterate until empty is found
         while (field[myLoveY][myLoveX] !== glassField) {
             myLoveX = Math.floor(Math.random() * width);
             myLoveY = Math.floor(Math.random() * height);
         }
-        field[myLoveY][myLoveX] = myLove;
+        field[myLoveY][myLoveX] = myLove; //that location is myLove
 
-        //never forget to return
         return field;
-	}
-    
-    randomStart(height,width) {
-         //random location of starting point (broken heart)
+    }
+
+    randomStart(height, width) {
+        //random the location of the myBrokenHeart character
         let startX = Math.floor(Math.random() * width);
         let startY = Math.floor(Math.random() * height);
 
-        //if the random location is empty then replace with starting point
-        //if the random location is not an empty then iterate until empty is found
+        //if the random myBrokenHeart character location is not an empty then iterate until empty is found
         while (this._field[startY][startX] !== glassField) {
             startX = Math.floor(Math.random() * width);
             startY = Math.floor(Math.random() * height);
         }
-        this._field[startY][startX] = myBrokenHeart;
+        this._field[startY][startX] = myBrokenHeart; //that location is myBrokenHeart character
 
-        //set the location from initial (0) to random location
+        //set the location from 0 to the new location;
         this._playerPositionX = startX;
         this._playerPositionY = startY;
+
     }
 
-    print() {
+    printField() {
 
-        //clear the terminal
-        console.clear();
-
-        // convert 2D array to string and print the field
-        this._field.forEach((e) => console.log(e.join("")));
-                                                             /* '🟩🟩🟩'
-                                                                '🟩🟩🟩' 
-                                                                '🟩🟩🟩' */
+        //clear terminal every time the user input the data
+        console.clear();    
+        
+        //convert 2D array into string 
+        this._field.forEach((e) => console.log(e.join('')));
     }
 
     move(userDirection) {
-        switch(userDirection) {
+        switch (userDirection) {
             case 'u':
-                if (this._playerPositionY - 1 < 0) {
-                    console.log("You fell out of bounds! Game over loser!");
-                    this._isPlaying = false;
-                    return;
-                }
-                this._field[this._playerPositionY][this._playerPositionX] = lovePath;
                 this.checkConditionUp();
+                this._field[this._playerPositionY][this._playerPositionX] = lovePath; 
                 this._playerPositionY -= 1;
                 break;
-    
+
             case 'd':
-                if (this._playerPositionY + 1 >= this._field.length) {
-                    console.log("You fell out of bounds! Game over loser!");
-                    this._isPlaying = false;
-                    return;
-                }
-                this._field[this._playerPositionY][this._playerPositionX] = lovePath;
                 this.checkConditionDown();
+                this._field[this._playerPositionY][this._playerPositionX] = lovePath; 
                 this._playerPositionY += 1;
                 break;
-    
+
             case 'l':
-                if (this._playerPositionX - 1 < 0) {
-                    console.log("You fell out of bounds! Game over loser!");
-                    this._isPlaying = false;
-                    return;
-                }
-                this._field[this._playerPositionY][this._playerPositionX] = lovePath;
                 this.checkConditionLeft();
+                this._field[this._playerPositionY][this._playerPositionX] = lovePath; 
                 this._playerPositionX -= 1;
                 break;
-    
+
             case 'r':
-                if (this._playerPositionX + 1 >= this._field[0].length) {
-                    console.log("You fell out of bounds! Game over loser!");
-                    this._isPlaying = false;
-                    return;
-                }
-                this._field[this._playerPositionY][this._playerPositionX] = lovePath;
                 this.checkConditionRight();
+                this._field[this._playerPositionY][this._playerPositionX] = lovePath; 
                 this._playerPositionX += 1;
                 break;
-    
+
             default:
-                console.log("Invalid move!");
+                console.log('Invalid move! Please try again!');
                 break;
         }
-    
-        this._field[this._playerPositionY][this._playerPositionX] = myBrokenHeart;
-    }
-    
-    
 
-    checkConditionUp() {
-        switch (this._field[this._playerPositionY - 1][this._playerPositionX]) {
-            case hole:
-                console.log("You fell in a hole! Game over loser!");
-                this._isPlaying = false;
-                break;
+        //check if the location is in bound then reassign the location of the player current position
+        //if not then do not reassign the location
+        if (this._playerPositionX >= 0 && this._playerPositionY >=0 && this._playerPositionY <= this._field.length - 1 && this._playerPositionX <= this._field[0].length - 1) {
+            this._field[this._playerPositionY][this._playerPositionX] = myBrokenHeart; 
             
-            case myLove:
-                console.log("Congratulations, you found your love 💖!!!");
-                this._isPlaying = false;
-                break;
-
         }
+    }
 
+
+    //check the user move into input direction, if the next location is out of bound or hole then game over, if the next location is myLove then the user win and game end
+    checkConditionUp() {
+        if (this._playerPositionY - 1 < 0) {
+            console.log('You fell out of bounds! Game over!');
+            this._isPlaying = false;
+            return;
+        } else if (this._field[this._playerPositionY - 1][this._playerPositionX] === hole) {
+            console.log('You fell in a hole! Game over!');
+            this._isPlaying = false;
+        } else if (this._field[this._playerPositionY - 1][this._playerPositionX] === myLove) {
+            console.log('Congratulations, you found your love 💖!!!');
+            this._isPlaying = false;
+        } 
     }
 
     checkConditionDown() {
-        switch (this._field[this._playerPositionY + 1][this._playerPositionX]) {
-            case hole:
-                console.log("You fell in a hole! Game over loser!");
-                this._isPlaying = false;
-                break;
-            
-            case myLove:
-                console.log("Congratulations, you found your love 💖!!!");
-                this._isPlaying = false;
-                break;
-
-        }
+        if (this._playerPositionY + 1 >= this._field.length) {
+            console.log('You fell out of bounds! Game over!');
+            this._isPlaying = false;
+            return;
+        } else if (this._field[this._playerPositionY + 1][this._playerPositionX] === hole) {
+            console.log('You fell in a hole! Game over!');
+            this._isPlaying = false;
+        } else if (this._field[this._playerPositionY + 1][this._playerPositionX] === myLove) {
+            console.log('Congratulations, you found your love 💖!!!');
+            this._isPlaying = false;
+        } 
     }
 
     checkConditionLeft() {
-        switch (this._field[this._playerPositionY][this._playerPositionX - 1]) {
-            case hole:
-                console.log("You fell in a hole! Game over loser!");
-                this._isPlaying = false;
-                break;
-            
-            case myLove:
-                console.log("Congratulations, you found your love 💖!!!");
-                this._isPlaying = false;
-                break;
-
-        }
+        if (this._playerPositionX - 1 < 0) {
+            console.log('You fell out of bounds! Game over!');
+            this._isPlaying = false;
+            return;
+        } else if (this._field[this._playerPositionY][this._playerPositionX - 1] === hole) {
+            console.log('You fell in a hole! Game over!');
+            this._isPlaying = false;
+        } else if (this._field[this._playerPositionY][this._playerPositionX - 1] === myLove) {
+            console.log('Congratulations, you found your love 💖!!!');
+            this._isPlaying = false;
+        } 
     }
 
     checkConditionRight() {
-        switch (this._field[this._playerPositionY][this._playerPositionX + 1]) {
-            case hole:
-                console.log("You fell in a hole! Game over loser!");
-                this._isPlaying = false;
-                break;
-            
-            case myLove:
-                console.log("Congratulations, you found your love 💖!!!");
-                this._isPlaying = false;
-                break;
-
-        }
+        if (this._playerPositionX + 1 >= this._field[0].length) {
+            console.log('You fell out of bounds! Game over!');
+            this._isPlaying = false;
+            return;
+        } else if (this._field[this._playerPositionY][this._playerPositionX + 1] === hole) {
+            console.log('You fell in a hole! Game over!');
+            this._isPlaying = false;
+        } else if (this._field[this._playerPositionY][this._playerPositionX + 1] === myLove) {
+            console.log('Congratulations, you found your love 💖!!!');
+            this._isPlaying = false;
+        } 
     }
-    
+
     play() {
 
-        //variable for random the strating position
-        const height = this._field.length;
-        const width = this._field[0].length;
+        this.randomStart(this._field.length, this._field[0].length);
 
-        //random staring position
-        this.randomStart(height,width);
-        
-        //if the user cant find a love yet or the game is not over yet continue the game
-        while(this._isPlaying) {
+        //if the user cant find the love yet or the game is not over yet continue the game
+        while (this._isPlaying) {
 
-            //print game map everytime when user input the direction
-            this.print();
-            
-            //take direction from the user
-            const userDirection = prompt('Which way (u as Up, d as Down, l as Left, r as Right)!? ').toLowerCase();
-            
-            //when user input the direction then call the move method to move the broken heart
-            this.move(userDirection);
+            this.printField();
+            const userDirection = prompt('Which way (u as Up, d as Down, l as Left, r as Right)!? ');
+            this.move(userDirection.toLowerCase());
         }
     }
-}
 
+
+
+}
 
 const gameMap = new Field(Field.generateField());
 gameMap.play();
-
